@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Net6Test", "Net6Test\Net6Test.csproj", "{C4B0102C-D348-4009-BF46-B2D0C260F187}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreCache", "CoreCache\CoreCache.csproj", "{C4B0102C-D348-4009-BF46-B2D0C260F187}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "FcarwOdWBB6OSYnQ2KS7xE9aoAJOQN8PuEFgds39QnUzAuliKfAhwBXM+V4i55uDfG132XbDdjaj5h5adg7pXw==",
+  "dgSpecHash": "N735d6g7AgRBfwNZlppVyHV2ESeNYmvLvN6F+QJM2SH93pGfH23Ris+9pQvVriRVQsOdh0sGVsLC3a4N6OyFMg==",
   "success": true,
-  "projectFilePath": "/Users/gzf/RiderProjects/Net6Test/Net6Test/Net6Test.csproj",
+  "projectFilePath": "/Users/gzf/RiderProjects/CoreCache/CoreCache/CoreCache.csproj",
   "expectedPackageFiles": [
     "/Users/gzf/.nuget/packages/autofac/6.3.0/autofac.6.3.0.nupkg.sha512",
     "/Users/gzf/.nuget/packages/autofac.extensions.dependencyinjection/7.2.0/autofac.extensions.dependencyinjection.7.2.0.nupkg.sha512",
