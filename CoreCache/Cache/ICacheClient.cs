@@ -2,7 +2,7 @@ namespace CoreCache.Cache;
 
 public interface ICacheClient
 {
-    void Set(string key, string value, int duration);
+    void Set(string key, string value, long duration);
 
     string Get(string key);
 

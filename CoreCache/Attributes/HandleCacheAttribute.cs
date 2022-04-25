@@ -9,12 +9,14 @@ public class HandleCacheAttribute : Attribute, IFilterFactory, IFilterMetadata
     private readonly Type _type;
     private readonly string _name;
     private readonly string _key;
+    private readonly long _dueTime;
 
-    public HandleCacheAttribute(Type type, string name, string key)
+    public HandleCacheAttribute(Type type, string name, string key, long dueTime = 0)
     {
         _type = type;
         _name = name;
         _key = key;
+        _dueTime = dueTime;
     }
 
     public bool IsReusable { get; }
@@ -27,7 +29,7 @@ public class HandleCacheAttribute : Attribute, IFilterFactory, IFilterMetadata
         
         //通过反射实例化该过滤器的类
         var objFactory = ActivatorUtilities.CreateInstance(serviceProvider, _type,
-            new object[] { _name, _key, cacheClient });
+            new object[] { _name, _key, cacheClient, _dueTime });
         return (IFilterMetadata)objFactory;
 
     }

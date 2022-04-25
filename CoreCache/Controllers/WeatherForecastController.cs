@@ -23,16 +23,20 @@ public class WeatherForecastController : ControllerBase
     }
     
     [Route("/"), HttpGet]
-    [HandleCache(typeof(Cacheable), "user", "PostId:{user:id} QueryId: {id}")]
+    [HandleCache(typeof(Cacheable), "user", "PostId:{user:id} QueryId: {id}", TimeSpan.TicksPerSecond * 10 )]
     public IEnumerable<WeatherForecast> Get([FromBody]User user, [FromQuery]string id)
     {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        Console.WriteLine($"Req start:  {DateTime.Now.Millisecond}");
+
+        var result = Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        Console.WriteLine($"Req end:  {DateTime.Now.Millisecond}");
+        return result;
     }
 
 }

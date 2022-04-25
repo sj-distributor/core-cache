@@ -21,13 +21,15 @@ public class Cacheable : Attribute, IAsyncActionFilter
 {
     private readonly string _name;
     private string _key;
+    private readonly long _dueTime;
     private readonly ICacheClient _cacheClient;
 
 
-    public Cacheable(string name, string key, ICacheClient cacheClient)
+    public Cacheable(string name, string key, ICacheClient cacheClient, long dueTime = 0)
     {
         _name = name;
         _key = key;
+        _dueTime = dueTime;
         _cacheClient = cacheClient;
     }
 
@@ -56,17 +58,24 @@ public class Cacheable : Attribute, IAsyncActionFilter
             }
 
             var key = $"{_name}:{_key}";
-            
-            
+
+            var cacheString = _cacheClient.Get(key);
+            if (!string.IsNullOrEmpty(cacheString))
+            {
+                context.HttpContext.Response.ContentType = "application/json; charset=utf-8";
+                await context.HttpContext.Response.WriteAsync(cacheString);
+                return;
+            }
 
             var executedContext = await next();
 
             #region do logic get response
 
             //2. do logic get response
-            if (context.Result is ViewResult viewResult)
+            if (executedContext.Result is ViewResult viewResult)
             {
-                var executor = (ViewResultExecutor)context.HttpContext.RequestServices.GetService<IActionResultExecutor<ViewResult>>();
+                var executor = (ViewResultExecutor)executedContext.HttpContext.RequestServices
+                    .GetService<IActionResultExecutor<ViewResult>>()!;
 
                 var viewEngineResult = executor.FindView(context, viewResult);
 
@@ -88,7 +97,7 @@ public class Cacheable : Attribute, IAsyncActionFilter
 
                     view.RenderAsync(viewContext).GetAwaiter().GetResult();
 
-                    context.Result = new ContentResult
+                    executedContext.Result = new ContentResult
                     {
                         Content = writer.ToString(),
                         ContentType = "text/html; charset=utf-8",
@@ -96,17 +105,17 @@ public class Cacheable : Attribute, IAsyncActionFilter
                     };
                 }
             }
-            else if (context.Result is JsonResult jsonResult)
+            else if (executedContext.Result is JsonResult jsonResult)
             {
-            }else if (executedContext.Result is ObjectResult objectResult)
+            }
+            else if (executedContext.Result is ObjectResult objectResult)
             {
-                _cacheClient.Set(key, JsonConvert.SerializeObject(objectResult.Value), 10000);
+                _cacheClient.Set(key, JsonConvert.SerializeObject(objectResult.Value), _dueTime);
             }
 
             #endregion
-            
 
-           
+
             Console.WriteLine("1");
             //3. do cache key value
         }
