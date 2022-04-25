@@ -1,11 +1,11 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=0542b575_002Dd377_002D4dbf_002Daeff_002Db34f13ccaff0/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Test1 #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::C4B0102C-D348-4009-BF46-B2D0C260F187::net6.0::Net6Test.Test.Test1&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::C4B0102C-D348-4009-BF46-B2D0C260F187::net6.0::CoreCache.Test.Test1&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=9b2c2ca0_002D59b9_002D4490_002D8464_002Da946de63a498/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Test1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::C4B0102C-D348-4009-BF46-B2D0C260F187::net6.0::Net6Test.Test.Test1&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::C4B0102C-D348-4009-BF46-B2D0C260F187::net6.0::CoreCache.Test.Test1&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

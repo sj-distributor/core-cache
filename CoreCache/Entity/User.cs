@@ -1,4 +1,4 @@
-namespace Net6Test.Entity;
+namespace CoreCache.Entity;
 
 public class User
 {

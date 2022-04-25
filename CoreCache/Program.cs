@@ -1,7 +1,7 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Net6Test.Attributes;
-using Net6Test.Cache;
+using CoreCache.Attributes;
+using CoreCache.Cache;
 
 var builder = WebApplication.CreateBuilder(args);
 

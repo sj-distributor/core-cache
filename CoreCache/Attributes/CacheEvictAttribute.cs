@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
-using Net6Test.Cache;
+using CoreCache.Cache;
 
-namespace Net6Test.Attributes;
+namespace CoreCache.Attributes;
 
 [AttributeUsage(AttributeTargets.Method)]
 public class CacheEvict : Attribute, IAsyncActionFilter

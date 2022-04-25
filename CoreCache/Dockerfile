@@ -5,16 +5,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Net6Test/Net6Test.csproj", "Net6Test/"]
-RUN dotnet restore "Net6Test/Net6Test.csproj"
+COPY ["CoreCache/CoreCache.csproj", "CoreCache/"]
+RUN dotnet restore "CoreCache/CoreCache.csproj"
 COPY . .
-WORKDIR "/src/Net6Test"
-RUN dotnet build "Net6Test.csproj" -c Release -o /app/build
+WORKDIR "/src/CoreCache"
+RUN dotnet build "CoreCache.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Net6Test.csproj" -c Release -o /app/publish
+RUN dotnet publish "CoreCache.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Net6Test.dll"]
+ENTRYPOINT ["dotnet", "CoreCache.dll"]

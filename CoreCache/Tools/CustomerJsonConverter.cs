@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 using JsonException = Newtonsoft.Json.JsonException;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
-namespace Net6Test.Tools;
+namespace CoreCache.Tools;
 
 public class CustomerJsonConverter : CustomCreationConverter<IDictionary<string, object>>
 {

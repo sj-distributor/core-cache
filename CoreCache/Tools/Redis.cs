@@ -1,4 +1,4 @@
-namespace Net6Test.Tools;
+namespace CoreCache.Tools;
 
 public class RedisClient
 {

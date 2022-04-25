@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Net6Test.Cache;
-using Net6Test.Tools;
+using CoreCache.Cache;
+using CoreCache.Tools;
 using Newtonsoft.Json;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
-namespace Net6Test.Attributes;
+namespace CoreCache.Attributes;
 
 [AttributeUsage(AttributeTargets.Method)]
 public class Cacheable : Attribute, IAsyncActionFilter

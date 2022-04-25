@@ -1,4 +1,4 @@
-namespace Net6Test.Cache;
+namespace CoreCache.Cache;
 
 public interface ICacheClient
 {

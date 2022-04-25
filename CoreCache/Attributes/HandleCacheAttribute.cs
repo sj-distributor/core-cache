@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc.Filters;
-using Net6Test.Cache;
-using Net6Test.Tools;
+using CoreCache.Cache;
+using CoreCache.Tools;
 
-namespace Net6Test.Attributes;
+namespace CoreCache.Attributes;
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public class HandleCacheAttribute : Attribute, IFilterFactory, IFilterMetadata
 {

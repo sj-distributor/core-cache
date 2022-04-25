@@ -1,4 +1,4 @@
-namespace Net6Test;
+namespace CoreCache;
 
 public class WeatherForecast
 {

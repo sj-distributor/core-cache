@@ -1,17 +1,12 @@
-using System.Collections;
-using System.IO.Compression;
 using System.Reflection;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Net6Test.Entity;
-using Net6Test.Tools;
+using CoreCache.Entity;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
-using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 
-namespace Net6Test;
+namespace CoreCache;
 
 public class Test
 {

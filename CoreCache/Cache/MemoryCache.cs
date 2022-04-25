@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Net6Test.Cache;
+namespace CoreCache.Cache;
 
 public class MemoryCache : ICacheClient
 {

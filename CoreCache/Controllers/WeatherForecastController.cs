@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Net6Test.Attributes;
-using Net6Test.Entity;
+using CoreCache.Attributes;
+using CoreCache.Entity;
 using Type = System.Type;
 
-namespace Net6Test.Controllers;
+namespace CoreCache.Controllers;
 
 [ApiController]
 [Route("[controller]")]
