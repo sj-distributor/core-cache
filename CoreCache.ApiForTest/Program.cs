@@ -1,17 +1,16 @@
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using CoreCache.Attributes;
-using CoreCache.Cache;
+using Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
+JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
 {
-    containerBuilder.RegisterInstance<ICacheClient>(new MemoryCache()).SingleInstance();
-});
+    ContractResolver = new CamelCasePropertyNamesContractResolver()
+};
 
-builder.Services.AddTransient(typeof(Cacheable));
+// 添加缓存依赖
+builder.Services.AddCoreCache();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -36,3 +35,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

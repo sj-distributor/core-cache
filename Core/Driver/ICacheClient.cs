@@ -1,8 +1,8 @@
-namespace CoreCache.Cache;
+namespace Core.Driver;
 
 public interface ICacheClient
 {
-    void Set(string key, string value, long duration);
+    void Set(string key, string value, long expire);
 
     string Get(string key);
 

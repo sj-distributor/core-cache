@@ -1,4 +1,4 @@
-namespace CoreCache;
+namespace CoreCache.ApiForTest;
 
 public class WeatherForecast
 {
