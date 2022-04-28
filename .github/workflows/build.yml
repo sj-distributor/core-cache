@@ -108,4 +108,4 @@ jobs:
           path: artifacts
 
       - name: Push to nuget
-        run: dotnet nuget push artifacts/CoreCache.nupkg --api-key ${{secrets.NUGET}} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push artifacts/CoreCache.${{ steps.gitversion.outputs.fullSemVer }}.nupkg --api-key ${{secrets.NUGET}} --source https://api.nuget.org/v3/index.json
