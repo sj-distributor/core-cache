@@ -53,9 +53,6 @@ jobs:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ${{ github.workspace }}/IntegrationTests/TestResults/**/coverage.cobertura.xml
           
-      - name: Show DIR
-        run: ls -al ./UnitTests/TestResults
-        
       - name: Pack
         run: dotnet pack --configuration=Release -o artifacts -p:symbolPackageFormat=snupkg --include-symbols
 
