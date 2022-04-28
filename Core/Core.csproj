@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <PackageId>CoreCache</PackageId>
-        <Version>0.5.0</Version>
+        <PackageVersion>$(PackageVersion)</PackageVersion>
         <Authors>Anson.G</Authors>
         <Company>Wiltechs</Company>
     </PropertyGroup>

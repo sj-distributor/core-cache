@@ -33,13 +33,17 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: Release Tag Updater   
-        uses: sersoft-gmbh/running-release-tags-action@v1 
+#      - name: Release Tag Updater   
+#        uses: sersoft-gmbh/running-release-tags-action@v1
+#        
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 6.0.101
+          
+      - name: Run Build
+        run: dotnet build --configuration Release -p:PackageVersion=${{ github.ref }}
 
       - name: Run tests
         run: dotnet test --configuration=Release -p:Platform="Any CPU" --collect:"XPlat Code Coverage"
