@@ -44,7 +44,7 @@ jobs:
       - name: Publish Code Coverage Results
         uses: codecov/codecov-action@v2
         with:
-          file: ${{pwd}}/UnitTests/TestResults/**/coverage.cobertura.xml,${{pwd}}IntegrationTests/TestResults/**/coverage.cobertura.xml
+          file: ${{ github.workspace }}/UnitTests/TestResults/**/coverage.cobertura.xml,${{ github.workspace }}/IntegrationTests/TestResults/**/coverage.cobertura.xml
 
       - name: Pack
         run: dotnet pack --configuration=Release -o artifacts -p:symbolPackageFormat=snupkg --include-symbols
