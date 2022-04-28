@@ -21,37 +21,36 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      Solution_Name:  CoreCache.sln
+      Solution_Name: CoreCache.sln
       UnitTest_Project_Path: UnitTests
       IntegrationTests_Project_Path: IntegrationTests
       Pack_Project_Path: Core
-      Configuration: Release
       NET_SDK_VERSION: 6.0.101
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    
-#     - name: Setup .NET SDK
-#         uses: actions/setup-dotnet@v1
-#         with:
-#           dotnet-version: ${{ env.NET_SDK_VERSION }}
-        
-    - name: Run tests
-      run: dotnet test --configuration=$env:Configuration --collect:"XPlat Code Coverage"
-      
-    - name: Publish Code Coverage Results
-      uses: codecov/codecov-action@v2
-      with:
-        file: ./UnitTests/TestResults/**/coverage.cobertura.xml, ./IntegrationTests/TestResults/**/coverage.cobertura.xml
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-    - name: Pack
-      run: dotnet pack --configuration=$env:Configuration -o artifacts -p:symbolPackageFormat=snupkg --include-symbols
-      
-    - name: Store nupkg
-      uses: actions/upload-artifact@v3
-      with:
-        name: Nuget packages
-        path: artifacts
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.101
+
+      - name: Run tests
+        run: dotnet test --configuration=Release -p:Platform="Any CPU" --collect:"XPlat Code Coverage"
+
+      - name: Publish Code Coverage Results
+        uses: codecov/codecov-action@v2
+        with:
+          file: ./UnitTests/TestResults/**/coverage.cobertura.xml, ./IntegrationTests/TestResults/**/coverage.cobertura.xml
+
+      - name: Pack
+        run: dotnet pack --configuration=Release -o artifacts -p:symbolPackageFormat=snupkg --include-symbols
+
+      - name: Store nupkg
+        uses: actions/upload-artifact@v3
+        with:
+          name: Nuget packages
+          path: artifacts
