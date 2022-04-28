@@ -40,6 +40,9 @@ jobs:
 
       - name: Run tests
         run: dotnet test --configuration=Release -p:Platform="Any CPU" --collect:"XPlat Code Coverage"
+        
+      - name: Show DIR
+        run: ls -al  && pwd
 
       - name: Publish Code Coverage Results
         uses: codecov/codecov-action@v2
