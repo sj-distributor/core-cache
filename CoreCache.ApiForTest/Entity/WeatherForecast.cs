@@ -1,3 +1,4 @@
+#nullable enable
 namespace CoreCache.ApiForTest.Entity;
 
 public record WeatherForecast

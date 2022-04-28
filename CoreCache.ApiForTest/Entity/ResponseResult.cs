@@ -35,6 +35,7 @@ public class ResponseResult<T>
     /// 成功状态返回结果
     /// </summary>
     /// <param name="result">返回的数据</param>
+    /// <param name="data"></param>
     /// <returns></returns>
     public static ResponseResult<T> SuccessResult(T data)
     {
