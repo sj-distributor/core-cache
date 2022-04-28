@@ -99,7 +99,7 @@ jobs:
           file: ${{ github.workspace }}/IntegrationTests/TestResults/**/coverage.cobertura.xml
 
       - name: Pack
-        run: dotnet pack -p:PackageVersion=${{ steps.gitversion.outputs.fullSemVer }} --configuration=Release -o artifacts -p:symbolPackageFormat=snupkg --include-symbols
+        run: dotnet pack -p:PackageVersion=${{ steps.gitversion.outputs.SemVer }} --configuration=Release -o artifacts -p:symbolPackageFormat=snupkg --include-symbols
 
       - name: Store nupkg
         uses: actions/upload-artifact@v3
@@ -108,4 +108,4 @@ jobs:
           path: artifacts
 
       - name: Push to nuget
-        run: dotnet nuget push artifacts/CoreCache.${{ steps.gitversion.outputs.fullSemVer }}.nupkg --api-key ${{secrets.NUGET}} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push artifacts/CoreCache.${{ steps.gitversion.outputs.SemVer }}.nupkg --api-key ${{secrets.NUGET}} --source https://api.nuget.org/v3/index.json
