@@ -1,0 +1,54 @@
+# This is a basic workflow to help you get started with Actions
+
+name: .NET build
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    
+    env:
+      Solution_Name:  CoreCache.sln
+      UnitTest_Project_Path: UnitTests
+      IntegrationTests_Project_Path: IntegrationTests
+      Pack_Project_Path: Core
+      Configuration: Release
+      NET_SDK_VERSION: 6.0.101
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v2.0.0
+        with:
+          dotnet-version: ${{ env.NET_SDK_VERSION }}
+        
+    - name: Run tests
+      run: dotnet test --configuration=$env:Configuration --collect:"XPlat Code Coverage"
+      
+    - name: Publish Code Coverage Results
+      uses: codecov/codecov-action@v2
+      with:
+        file: ./UnitTests/TestResults/**/coverage.cobertura.xml, ./IntegrationTests/TestResults/**/coverage.cobertura.xml
+
+    - name: Pack
+      run: dotnet pack --configuration=$env:Configuration -o artifacts -p:symbolPackageFormat=snupkg --include-symbols
+      
+    - name: Store nupkg
+      uses: actions/upload-artifact@v3
+      with:
+        name: Nuget packages
+        path: artifacts
