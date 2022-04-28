@@ -41,11 +41,16 @@ jobs:
       - name: Run tests
         run: dotnet test --configuration=Release -p:Platform="Any CPU" --collect:"XPlat Code Coverage"
         
-      - name: Publish Code Coverage Results
+      - name: Publish Code Coverage UnitTest
         uses: codecov/codecov-action@v2
         with:
-          file: ${{ github.workspace }}/UnitTests/TestResults/**/coverage.cobertura.xml,${{ github.workspace }}/IntegrationTests/TestResults/**/coverage.cobertura.xml
-
+          file: ${{ github.workspace }}/UnitTests/TestResults/**/coverage.cobertura.xml
+          
+      - name: Publish Code Coverage IntegrationTests
+        uses: codecov/codecov-action@v2
+        with:
+          file: ${{ github.workspace }}/IntegrationTests/TestResults/**/coverage.cobertura.xml
+          
       - name: Show DIR
         run: ls -al ./UnitTests/TestResults
         
@@ -57,3 +62,6 @@ jobs:
         with:
           name: Nuget packages
           path: artifacts
+          
+      - name: Store nupkg
+        run: dotnet nuget push AppLogger.1.0.0.nupkg --api-key ${{secrets.NUGET}} --source https://api.nuget.org/v3/index.json
