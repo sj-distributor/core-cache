@@ -8,7 +8,7 @@ namespace Core.Utils;
 
 public static class KeyGenerateHelper
 {
-    public static string GetKey(string name, string originKey, IDictionary<string, object?> parameters)
+    public static string GetKey(string name, string originKey, IDictionary<string, object>? parameters)
     {
         var values = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())

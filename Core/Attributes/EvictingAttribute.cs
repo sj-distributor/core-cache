@@ -23,7 +23,6 @@ public class EvictingAttribute : Attribute, IFilterFactory
 
     public IFilterMetadata CreateInstance(IServiceProvider serviceProvider)
     {
-        var cacheEvict = serviceProvider.GetService<CacheEvict>();
         var cacheClient = serviceProvider.GetService<ICacheClient>();
 
         if (cacheClient == null)
@@ -35,6 +34,5 @@ public class EvictingAttribute : Attribute, IFilterFactory
             new CacheEvictSettings() { Name = _names, Key = _key},
             cacheClient);
         return (IFilterMetadata)instance;
-        return (IFilterMetadata)cacheEvict;
     }
 }

@@ -1,3 +1,4 @@
+#nullable enable
 using Microsoft.OpenApi.Extensions;
 
 namespace CoreCache.ApiForTest.Entity;
@@ -48,7 +49,7 @@ public class ResponseResult<T>
     /// <param name="code">状态码</param>
     /// <param name="msg">失败信息</param>
     /// <returns></returns>
-    public static ResponseResult<T> FailResult(string? msg = null)
+    public static ResponseResult<T> FailResult(string msg = "")
     {
         return new ResponseResult<T> { Status = ResultStatus.Fail, Message = msg };
     }
@@ -59,7 +60,7 @@ public class ResponseResult<T>
     /// <param name="code">状态码</param>
     /// <param name="msg">异常信息</param>
     /// <returns></returns>
-    public static ResponseResult<T> ErrorResult(string? msg = null)
+    public static ResponseResult<T> ErrorResult(string msg = "")
     {
         return new ResponseResult<T> { Status = ResultStatus.Error, Message = msg };
     }
@@ -69,6 +70,8 @@ public class ResponseResult<T>
     /// </summary>
     /// <param name="status"></param>
     /// <param name="result"></param>
+    /// <param name="data"></param>
+    /// <param name="msg"></param>
     /// <returns></returns>
     public static ResponseResult<T> Result(ResultStatus status, T data, string? msg = null)
     {

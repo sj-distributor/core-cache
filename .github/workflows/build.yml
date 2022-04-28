@@ -64,4 +64,4 @@ jobs:
           path: artifacts
           
       - name: Store nupkg
-        run: dotnet nuget push AppLogger.1.0.0.nupkg --api-key ${{secrets.NUGET}} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push artifacts/CoreCache.0.5.0.nupkg --api-key ${{secrets.NUGET}} --source https://api.nuget.org/v3/index.json
