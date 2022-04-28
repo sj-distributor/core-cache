@@ -20,7 +20,6 @@ public class WeatherForecastController : ControllerBase
     [Evicting(typeof(CacheEvict), new []{"anything"}, "QueryId:{id}")]
     public IEnumerable<WeatherForecast> Get2([FromQuery] string id)
     {
-        Console.WriteLine("action...");
         return GetData();
     }
 
@@ -32,7 +31,7 @@ public class WeatherForecastController : ControllerBase
     }
     
     [Route("/users"), HttpPost]
-    [Caching(typeof(Cacheable), "anything", "user:1:id")]
+    [Caching(typeof(Cacheable), "post", "user:1:id")]
     public ResponseResult<IEnumerable<WeatherForecast>> GetUsers([FromBody] List<User> users)
     {
         return ResponseResult<IEnumerable<WeatherForecast>>.SuccessResult(GetData());

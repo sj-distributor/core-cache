@@ -1,19 +1,18 @@
 using System;
-using System.Threading;
+using System.Threading.Tasks;
 using Core.Driver;
-using NSubstitute;
 using Xunit;
 
 namespace UnitTests;
 
+[Collection("Sequential")]
 public class MemoryCacheTests
 {
-
     public MemoryCache _memoryCache;
-    
+
     public MemoryCacheTests()
     {
-        _memoryCache = Substitute.For<MemoryCache>();
+        _memoryCache = new MemoryCache();
     }
 
     [Theory]
@@ -25,18 +24,20 @@ public class MemoryCacheTests
         var s = _memoryCache.Get(key);
         Assert.Equal(s, result);
     }
-    
+
     [Theory]
-    [InlineData("key", "18", "", TimeSpan.TicksPerSecond * 1)]
-    [InlineData("key1", "19", "", TimeSpan.TicksPerSecond * 1)]
-    public void TestMemoryCacheCanSetTimeout(string key, string value, string result, long expire = 0)
+    [InlineData("key1", "18", "", TimeSpan.TicksPerSecond * 1)]
+    [InlineData("key2", "19", "", TimeSpan.TicksPerSecond * 1)]
+    public async void TestMemoryCacheCanSetTimeout(string key, string value, string result, long expire = 0)
     {
         _memoryCache.Set(key, value, expire);
-        Thread.Sleep(TimeSpan.FromSeconds(1.5));
+
+        await Task.Delay(TimeSpan.FromSeconds(1.5));
+
         var s = _memoryCache.Get(key);
         Assert.Equal(s, result);
     }
-    
+
     [Theory]
     [InlineData("anson", "18", "")]
     [InlineData("anson1", "19", "")]
@@ -47,7 +48,7 @@ public class MemoryCacheTests
         var s = _memoryCache.Get(key);
         Assert.Equal(s, result);
     }
-    
+
     [Theory]
     [InlineData("anson1111", "18", "")]
     [InlineData("anson2222", "19", "")]
