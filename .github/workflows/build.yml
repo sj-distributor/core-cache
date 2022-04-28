@@ -54,7 +54,7 @@ jobs:
           file: ${{ github.workspace }}/IntegrationTests/TestResults/**/coverage.cobertura.xml
           
       - name: Pack
-        run: dotnet pack --configuration=Release -o artifacts -p:symbolPackageFormat=snupkg --include-symbols
+        run: dotnet pack -p:PackageVersion=0.5.${{ github.run_number }} --configuration=Release -o artifacts -p:symbolPackageFormat=snupkg --include-symbols
 
       - name: Store nupkg
         uses: actions/upload-artifact@v3
