@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreCache.ApiForTest.Entity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -12,11 +11,11 @@ namespace IntegrationTests;
 
 [Collection("Sequential")]
 
-public class RequestCacheTests : IClassFixture<WebApplicationFactory<Program>>
+public class ApiRequestCacheTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient _httpClient;
 
-    public RequestCacheTests(WebApplicationFactory<Program> factory)
+    public ApiRequestCacheTests(WebApplicationFactory<Program> factory)
     {
         _httpClient = factory.CreateClient();
     }
@@ -102,5 +101,17 @@ public class RequestCacheTests : IClassFixture<WebApplicationFactory<Program>>
 
         Assert.NotEqual(result1, result3);
         Assert.Equal(result2, result4);
+    }
+    
+    [Fact]
+    public async void CanTriggerEmptyNameOrKeyRequest()
+    {
+        var resp1 = await _httpClient.GetAsync("/users?id=5");
+        var result1 = await resp1.Content.ReadAsStringAsync();
+
+        var resp2 = await _httpClient.GetAsync("/users?id=5");
+        var result2 = await resp2.Content.ReadAsStringAsync();
+
+        Assert.NotEqual(result1, result2);
     }
 }

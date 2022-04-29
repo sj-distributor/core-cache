@@ -45,7 +45,7 @@ public class Cacheable : Attribute, IAsyncActionFilter
                 context.Result = new ContentResult()
                 {
                     Content = cacheString,
-                    ContentType = context.HttpContext.Request.ContentType
+                    ContentType = "text/html; charset=utf-8"
                 };
                 return;
             }

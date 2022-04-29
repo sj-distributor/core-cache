@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Core.Attributes;
 using CoreCache.ApiForTest.Entity;
+using CoreCache.ApiForTest.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCache.ApiForTest.Controllers;
@@ -12,47 +16,35 @@ public class WeatherForecastController : ControllerBase
     [Caching(typeof(Cacheable), "anything", "QueryId:{id}", TimeSpan.TicksPerSecond * 2)]
     public IEnumerable<WeatherForecast> Get([FromQuery] string id)
     {
-        return GetData();
+        return DataUtils.GetData();
     }
-    
+
     [Route("/evict-and-cache"), HttpGet]
     [Caching(typeof(Cacheable), "anson", "QueryId:{id}")]
-    [Evicting(typeof(CacheEvict), new []{"anything"}, "QueryId:{id}")]
+    [Evicting(typeof(CacheEvict), new[] { "anything" }, "QueryId:{id}")]
     public IEnumerable<WeatherForecast> Get2([FromQuery] string id)
     {
-        return GetData();
+        return DataUtils.GetData();
     }
 
     [Route("/"), HttpPost]
-    [Evicting(typeof(CacheEvict), new []{"anything"}, "QueryId:{id}")]
-    public ResponseResult<IEnumerable<WeatherForecast>> Post([FromQuery] string id)
+    [Evicting(typeof(CacheEvict), new[] { "anything" }, "QueryId:{id}")]
+    public IEnumerable<WeatherForecast> Post([FromQuery] string id)
     {
-        return ResponseResult<IEnumerable<WeatherForecast>>.SuccessResult(GetData());
+        return DataUtils.GetData();
     }
-    
+
     [Route("/users"), HttpPost]
     [Caching(typeof(Cacheable), "post", "user:1:id")]
-    public ResponseResult<IEnumerable<WeatherForecast>> GetUsers([FromBody] List<User> users)
+    public IEnumerable<WeatherForecast> PostUsers([FromBody] List<User> users)
     {
-        return ResponseResult<IEnumerable<WeatherForecast>>.SuccessResult(GetData());
+        return DataUtils.GetData();
     }
 
-    
-    
-    
-
-    private WeatherForecast[] GetData()
+    [Route("/users"), HttpGet]
+    [Caching(typeof(Cacheable), "", "")]
+    public IEnumerable<WeatherForecast> GetUsers([FromQuery] string id)
     {
-        var summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = summaries[Random.Shared.Next(summaries.Length)]
-            })
-            .ToArray();
+        return DataUtils.GetData();
     }
 }
