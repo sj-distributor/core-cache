@@ -22,7 +22,7 @@ public class MemoryCache : ICacheClient
         InitBucket(_map, _buckets);
     }
 
-    public void Set(string key, string value, long expire = 0)
+    public ValueTask Set(string key, string value, long expire = 0)
     {
         var bucket = GetBucket(HashKey(key));
 
@@ -45,6 +45,8 @@ public class MemoryCache : ICacheClient
                 });
             }
         }
+
+        return ValueTask.CompletedTask;
     }
 
     private void EvictLoop(Dictionary<uint, ConcurrentDictionary<string, CacheItem>> map)
@@ -52,24 +54,23 @@ public class MemoryCache : ICacheClient
         foreach (var bucketId in map.Keys)
         {
             var bucket = GetBucket(bucketId);
-            new Timer((bk) =>
-            {
-                DeleteTimeout(bk as ConcurrentDictionary<string, CacheItem>);
-            }, bucket, TimeSpan.Zero, TimeSpan.FromHours(1));
+            new Timer((bk) => { DeleteTimeout(bk as ConcurrentDictionary<string, CacheItem>); }, bucket, TimeSpan.Zero,
+                TimeSpan.FromHours(1));
         }
     }
 
-    public string Get(string key)
+    public ValueTask<string> Get(string key)
     {
         var bucket = GetBucket(HashKey(key));
 
-        if (!bucket.TryGetValue(key, out var cacheItem)) return "";
-        if (!(DateTime.Now > cacheItem.Timeout) || cacheItem.Timeout == null) return cacheItem.Value;
+        if (!bucket.TryGetValue(key, out var cacheItem)) return ValueTask.FromResult("");
+        if (!(DateTime.Now > cacheItem.Timeout) || cacheItem.Timeout == null)
+            return ValueTask.FromResult(cacheItem.Value);
         bucket.TryRemove(key, out var _);
-        return "";
+        return ValueTask.FromResult("");
     }
 
-    public void Delete(string key)
+    public ValueTask Delete(string key)
     {
         if (key.Contains('*'))
         {
@@ -92,6 +93,8 @@ public class MemoryCache : ICacheClient
             var bucket = GetBucket(HashKey(key));
             bucket.Keys.Where(x => x == key).ToList().ForEach(k => bucket.TryRemove(k, out var _));
         }
+
+        return ValueTask.CompletedTask;
     }
 
     private void DeleteTimeout(ConcurrentDictionary<string, CacheItem> bucket)

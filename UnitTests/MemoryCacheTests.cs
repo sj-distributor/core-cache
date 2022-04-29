@@ -18,10 +18,10 @@ public class MemoryCacheTests
     [Theory]
     [InlineData("anson", "18", "18")]
     [InlineData("anson1", "19", "19")]
-    public void TestMemoryCacheCanSet(string key, string value, string result)
+    public async void TestMemoryCacheCanSet(string key, string value, string result)
     {
-        _memoryCache.Set(key, value);
-        var s = _memoryCache.Get(key);
+        await _memoryCache.Set(key, value);
+        var s = await _memoryCache.Get(key);
         Assert.Equal(s, result);
     }
 
@@ -30,33 +30,33 @@ public class MemoryCacheTests
     [InlineData("key2", "19", "", TimeSpan.TicksPerSecond * 1)]
     public async void TestMemoryCacheCanSetTimeout(string key, string value, string result, long expire = 0)
     {
-        _memoryCache.Set(key, value, expire);
+       await _memoryCache.Set(key, value, expire);
 
         await Task.Delay(TimeSpan.FromSeconds(1.5));
 
-        var s = _memoryCache.Get(key);
+        var s = await _memoryCache.Get(key);
         Assert.Equal(s, result);
     }
 
     [Theory]
     [InlineData("anson", "18", "")]
     [InlineData("anson1", "19", "")]
-    public void TestMemoryCacheCanDelete(string key, string value, string result)
+    public async void TestMemoryCacheCanDelete(string key, string value, string result)
     {
-        _memoryCache.Set(key, value);
-        _memoryCache.Delete(key);
-        var s = _memoryCache.Get(key);
+        await _memoryCache.Set(key, value);
+        await _memoryCache.Delete(key);
+        var s = await _memoryCache.Get(key);
         Assert.Equal(s, result);
     }
 
     [Theory]
     [InlineData("anson1111", "18", "")]
     [InlineData("anson2222", "19", "")]
-    public void TestMemoryCacheCanDeleteByPattern(string key, string value, string result)
+    public async void TestMemoryCacheCanDeleteByPattern(string key, string value, string result)
     {
-        _memoryCache.Set(key, value);
-        _memoryCache.Delete("anson*");
-        var s = _memoryCache.Get(key);
+        await _memoryCache.Set(key, value);
+        await _memoryCache.Delete("anson*");
+        var s = await _memoryCache.Get(key);
         Assert.Equal(s, result);
     }
 }

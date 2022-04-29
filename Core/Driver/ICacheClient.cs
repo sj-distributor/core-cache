@@ -2,9 +2,9 @@ namespace Core.Driver;
 
 public interface ICacheClient
 {
-    void Set(string key, string value, long expire);
+    ValueTask Set(string key, string value, long expire);
 
-    string Get(string key);
+    ValueTask<string> Get(string key);
 
-    void Delete(string key);
+    ValueTask Delete(string key);
 }

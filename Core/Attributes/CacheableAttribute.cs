@@ -38,7 +38,7 @@ public class Cacheable : Attribute, IAsyncActionFilter
         {
             var key = KeyGenerateHelper.GetKey(_name, _key, context.ActionArguments);
             
-            var cacheString = _cacheClient.Get(key);
+            var cacheString = await _cacheClient.Get(key);
             
             if (!string.IsNullOrEmpty(cacheString))
             {
@@ -82,15 +82,15 @@ public class Cacheable : Attribute, IAsyncActionFilter
 
                         view.RenderAsync(viewContext).GetAwaiter().GetResult();
                     
-                        _cacheClient.Set(key, writer.ToString(), _expire);
+                       await _cacheClient.Set(key, writer.ToString(), _expire);
                     }
                     break;
                 }
                 case JsonResult jsonResult:
-                    _cacheClient.Set(key, JsonConvert.SerializeObject(jsonResult.Value), _expire);
+                    await _cacheClient.Set(key, JsonConvert.SerializeObject(jsonResult.Value), _expire);
                     break;
                 case ObjectResult objectResult:
-                    _cacheClient.Set(key, JsonConvert.SerializeObject(objectResult.Value), _expire);
+                    await _cacheClient.Set(key, JsonConvert.SerializeObject(objectResult.Value), _expire);
                     break;
             }
             #endregion
