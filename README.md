@@ -11,6 +11,11 @@
 * Fast, concurrent, evicting in-memory cache written to keep big number of entries without impact on performance.
 * The cache consists of many buckets, each with its own lock. This helps scaling the performance on multi-core CPUs, since multiple CPUs may concurrently access distinct buckets.
 
+## 🤟Install 
+```
+PM     : Install-Package NetCoreCache
+Net CLI: dotnet add package NetCoreCache
+```
 
 ## 🚀Quick start
 
