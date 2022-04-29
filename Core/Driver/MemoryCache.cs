@@ -55,7 +55,7 @@ public class MemoryCache : ICacheClient
             new Timer((bk) =>
             {
                 DeleteTimeout(bk as ConcurrentDictionary<string, CacheItem>);
-            }, bucket, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            }, bucket, TimeSpan.Zero, TimeSpan.FromHours(1));
         }
     }
 

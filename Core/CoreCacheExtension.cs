@@ -6,8 +6,8 @@ namespace Core;
 
 public static class CoreCacheExtension
 {
-    public static void AddCoreCache(this IServiceCollection services)
+    public static void AddCoreCache(this IServiceCollection services, uint buckets = 5)
     {
-        services.AddSingleton<ICacheClient>(new MemoryCache());
+        services.AddSingleton<ICacheClient>(new MemoryCache(buckets));
     }
 }
