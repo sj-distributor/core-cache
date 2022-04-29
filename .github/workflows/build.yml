@@ -86,12 +86,23 @@ jobs:
       - name: Run tests
         run: dotnet test --configuration=Release -p:Platform="Any CPU" --collect:"XPlat Code Coverage"
 
+      
+      - uses: actions/checkout@master
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: ${{ github.workspace }}/IntegrationTests/TestResults/**/coverage.cobertura.xml,${{ github.workspace }}/UnitTests/TestResults/**/coverage.cobertura.xml # optional
+          flags: unittests # optional
+          name: codecov-umbrella # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
+
       - name: Publish Code Coverage UnitTest
         uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ${{ github.workspace }}/UnitTests/TestResults/**/coverage.cobertura.xml
-
+      
       - name: Publish Code Coverage IntegrationTests
         uses: codecov/codecov-action@v1.0.2
         with:

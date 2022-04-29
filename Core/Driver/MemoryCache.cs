@@ -7,7 +7,7 @@ namespace Core.Driver;
 
 public class MemoryCache : ICacheClient
 {
-    private uint _buckets;
+    private readonly uint _buckets;
 
     private Dictionary<uint, ConcurrentDictionary<string, CacheItem>> _map = new();
 
