@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <PackageId>CoreCache</PackageId>
         <PackageVersion>$(PackageVersion)</PackageVersion>
-        <Authors>Anson.G</Authors>
+        <Authors>SugarChat</Authors>
         <Company>Wiltechs</Company>
     </PropertyGroup>
 
