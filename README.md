@@ -1,4 +1,4 @@
-# CoreCache
+# NetCoreCache
 
 [![Build Status](https://github.com/sj-distributor/core-cache//actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/sj-distributor/core-cache/actions?query=branch%3Amaster)
 [![codecov](https://codecov.io/gh/sj-distributor/core-cache/branch/master/graph/badge.svg?token=ELTCS7STTN)](https://codecov.io/gh/sj-distributor/core-cache)

@@ -1,6 +1,7 @@
 using Core.Driver;
 using Core.Entity;
 using Core.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -16,9 +17,10 @@ namespace Core.Attributes;
 public class Cacheable : Attribute, IAsyncActionFilter
 {
     private readonly string _name;
-    private string _key;
+    private readonly string _key;
     private readonly long _expire;
-    public readonly ICacheClient _cacheClient;
+    private readonly ICacheClient _cacheClient;
+    private readonly string _contentType;
 
     public Cacheable(CacheableSettings cacheableSettings, ICacheClient cacheClient)
     {
@@ -26,6 +28,7 @@ public class Cacheable : Attribute, IAsyncActionFilter
         _key = cacheableSettings.Key;
         _expire = cacheableSettings.Expire;
         _cacheClient = cacheClient;
+        _contentType = cacheableSettings.ContentType;
     }
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -37,21 +40,21 @@ public class Cacheable : Attribute, IAsyncActionFilter
         else
         {
             var key = KeyGenerateHelper.GetKey(_name, _key, context.ActionArguments);
-            
+
             var cacheString = await _cacheClient.Get(key);
-            
+
             if (!string.IsNullOrEmpty(cacheString))
             {
                 context.Result = new ContentResult()
                 {
                     Content = cacheString,
-                    ContentType = "text/html; charset=utf-8"
+                    ContentType = GetContentType(context.HttpContext)
                 };
                 return;
             }
-            
+
             var executedContext = await next();
-            
+
             #region do logic get response
 
             // set cache
@@ -81,9 +84,10 @@ public class Cacheable : Attribute, IAsyncActionFilter
                             viewOptions.Value.HtmlHelperOptions);
 
                         view.RenderAsync(viewContext).GetAwaiter().GetResult();
-                    
-                       await _cacheClient.Set(key, writer.ToString(), _expire);
+
+                        await _cacheClient.Set(key, writer.ToString(), _expire);
                     }
+
                     break;
                 }
                 case JsonResult jsonResult:
@@ -93,7 +97,18 @@ public class Cacheable : Attribute, IAsyncActionFilter
                     await _cacheClient.Set(key, JsonConvert.SerializeObject(objectResult.Value), _expire);
                     break;
             }
+
             #endregion
         }
+    }
+
+    private string GetContentType(HttpContext ctx)
+    {
+        if (string.IsNullOrEmpty(_contentType))
+        {
+            return ctx.Request.ContentType ?? "text/html; charset=utf-8";
+        }
+
+        return _contentType;
     }
 }

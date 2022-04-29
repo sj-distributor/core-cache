@@ -12,13 +12,15 @@ public class CachingAttribute : Attribute, IFilterFactory
     private readonly string _name;
     private readonly string _key;
     private readonly long _expire;
+    private readonly string _contentType;
 
-    public CachingAttribute(Type type, string name, string key, long expire = 0)
+    public CachingAttribute(Type type, string name, string key, long expire = 0, string contentType = "" )
     {
         _type = type;
         _name = name;
         _key = key;
         _expire = expire;
+        _contentType = contentType;
     }
 
     public bool IsReusable { get; }
@@ -30,7 +32,7 @@ public class CachingAttribute : Attribute, IFilterFactory
         var instance = ActivatorUtilities.CreateInstance(
             serviceProvider,
             _type,
-            new CacheableSettings() { Name = _name, Key = _key, Expire = _expire },
+            new CacheableSettings() { Name = _name, Key = _key, Expire = _expire, ContentType = _contentType},
             cacheClient);
         return (IFilterMetadata)instance;
     }
