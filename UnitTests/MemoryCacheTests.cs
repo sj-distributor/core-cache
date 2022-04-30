@@ -1,6 +1,7 @@
 using System;
-using System.Threading.Tasks;
+using System.Threading;
 using Core.Driver;
+using Core.Enum;
 using Xunit;
 
 namespace UnitTests;
@@ -12,7 +13,28 @@ public class MemoryCacheTests
 
     public MemoryCacheTests()
     {
-        _memoryCache = new MemoryCache();
+        _memoryCache = new MemoryCache(1, 50, MaxMemoryPolicy.TTL);
+    }
+
+    [Theory]
+    [InlineData(MaxMemoryPolicy.LRU)]
+    [InlineData(MaxMemoryPolicy.TTL)]
+    [InlineData(MaxMemoryPolicy.RANDOM)]
+    public void TestWhenTheMemoryIsFull_EliminatedSuccess(MaxMemoryPolicy maxMemoryPolicy)
+    {
+        var memoryCache = new MemoryCache(1, 50, maxMemoryPolicy);
+        for (var i = 0; i < 50; i++)
+        {
+            Thread.Sleep(TimeSpan.FromSeconds(0.1));
+            memoryCache.Set($"{i}", $"{i}");
+            for (var j = 0; j < i; j++)
+            {
+                memoryCache.Get($"{i}");
+            }
+        }
+        Assert.Equal(memoryCache.GetBuckets()[0].Count, 50);
+        memoryCache.Set("100", "100");
+        Assert.Equal(memoryCache.GetBuckets()[0].Count, 50 - (50 / 10) + 1);
     }
 
     [Theory]
@@ -21,19 +43,6 @@ public class MemoryCacheTests
     public async void TestMemoryCacheCanSet(string key, string value, string result)
     {
         await _memoryCache.Set(key, value);
-        var s = await _memoryCache.Get(key);
-        Assert.Equal(s, result);
-    }
-
-    [Theory]
-    [InlineData("key1", "18", "", TimeSpan.TicksPerSecond * 1)]
-    [InlineData("key2", "19", "", TimeSpan.TicksPerSecond * 1)]
-    public async void TestMemoryCacheCanSetTimeout(string key, string value, string result, long expire = 0)
-    {
-       await _memoryCache.Set(key, value, expire);
-
-        await Task.Delay(TimeSpan.FromSeconds(1.5));
-
         var s = await _memoryCache.Get(key);
         Assert.Equal(s, result);
     }

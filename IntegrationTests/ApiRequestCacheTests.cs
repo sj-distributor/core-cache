@@ -23,7 +23,6 @@ public class ApiRequestCacheTests : IClassFixture<WebApplicationFactory<Program>
     [Fact]
     public async void RequestCanCache()
     {
-        
         var resp1 = await _httpClient.GetAsync("/?id=1");
         var result1 = await resp1.Content.ReadAsStringAsync();
 
@@ -31,20 +30,6 @@ public class ApiRequestCacheTests : IClassFixture<WebApplicationFactory<Program>
         var result2 = await resp2.Content.ReadAsStringAsync();
 
         Assert.Equal(result1, result2);
-    }
-
-    [Fact]
-    public async void RequestCanCacheAndWillTimeout()
-    {
-        var resp1 = await _httpClient.GetAsync("/?id=2");
-        var result1 = await resp1.Content.ReadAsStringAsync();
-
-        await Task.Delay(TimeSpan.FromSeconds(2.5));
-        
-        var resp2 = await _httpClient.GetAsync("/?id=2");
-        var result2 = await resp2.Content.ReadAsStringAsync();
-
-        Assert.NotEqual(result1, result2);
     }
 
     [Fact]
