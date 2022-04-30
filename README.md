@@ -13,7 +13,6 @@
   since multiple CPUs may concurrently access distinct buckets.
 
 ## 🪣 About BigCache ( Multi Buckets )
-
 * Why`NetCoreCache` doesn't support cache expiration?
 * Because we don't need cache expiration in `NetCoreCache`. Cached entries inside `NetCoreCache` never expire. They are
   automatically evicted on cache size overflow.
