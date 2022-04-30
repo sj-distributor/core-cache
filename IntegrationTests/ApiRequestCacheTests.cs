@@ -95,7 +95,7 @@ public class ApiRequestCacheTests : IClassFixture<WebApplicationFactory<Program>
 
         var resp3 = await _httpClient.GetAsync("/?id=4");
         var result3 = await resp3.Content.ReadAsStringAsync();
-        
+
         var resp4 = await _httpClient.GetAsync("/evict-and-cache?id=4");
         var result4 = await resp4.Content.ReadAsStringAsync();
 

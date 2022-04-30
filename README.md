@@ -90,12 +90,26 @@ public class UserController : ControllerBase
 
 ```
 
-## Match both uses
+##⭐️⭐️️Match both uses⭐️⭐️
 
 ```
+    **** ‼️ If the cache is hit, 'Evicting' will only be executed once ‼️ ****
+    
     [Route("/evict-and-cache"), HttpGet]
     [Caching(typeof(Cacheable), "anson", "QueryId:{id}")]
     [Evicting(typeof(CacheEvict), new[] { "anything" }, "QueryId:{id}")]
+    public IEnumerable<WeatherForecast> Get([FromQuery] string id)
+    {
+        return DataUtils.GetData();
+    }
+    
+    
+    
+    **** ‼️ Evicting will always execute ‼️ ****
+    
+    [Route("/evict-and-cache"), HttpGet]
+    [Evicting(typeof(CacheEvict), new[] { "anything" }, "QueryId:{id}")]
+    [Caching(typeof(Cacheable), "anson", "QueryId:{id}")]
     public IEnumerable<WeatherForecast> Get([FromQuery] string id)
     {
         return DataUtils.GetData();
