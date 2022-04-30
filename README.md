@@ -9,17 +9,26 @@
 
 * Easy use of caching with dotnet core
 * Fast, concurrent, evicting in-memory cache written to keep big number of entries without impact on performance.
-* The cache consists of many buckets, each with its own lock. This helps scaling the performance on multi-core CPUs, since multiple CPUs may concurrently access distinct buckets.
+* The cache consists of many buckets, each with its own lock. This helps scaling the performance on multi-core CPUs,
+  since multiple CPUs may concurrently access distinct buckets.
 
-## 🤟Install 
+## 🪣 About BigCache ( Multi Buckets )
+* Why`NetCoreCache` doesn't support cache expiration?
+* Because we don't need cache expiration in `NetCoreCache`. Cached entries inside `NetCoreCache` never expire. They are
+  automatically evicted on cache size overflow.
+* It is easy to implement cache expiration on top of `NetCoreCache` by caching values with marshaled deadlines and
+  verifying deadlines after reading these values from the cache.
+
+## 🤟Install
+
 ```
 PM     : Install-Package NetCoreCache
 Net CLI: dotnet add package NetCoreCache
 ```
 
-## 🚀Quick start
+## 🚀 Quick start
 
-```
+```c#
 // Program.cs
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCoreCache();
@@ -39,40 +48,16 @@ public class UserController : ControllerBase
 }
 ```
 
-## 🪣About BigCache ( Multi Buckets )
-```
-Services.AddCoreCache(5); // Default 5 buckets 
-Services.AddCoreCache(128); // Maximum number of 128 buckets
-```
-
-## Cache automatic eviction
-
-```
-// UserController.cs
-[ApiController]
-[Route("[controller]")]
-public class UserController : ControllerBase
-{
-    [Route("/"), HttpGet]
-    [Caching(typeof(Cacheable), "user", "{id}", TimeSpan.TicksPerSecond * 2)] // Cache expires after two seconds
-    public User Get([FromQuery] string id)
-    {
-        return DataUtils.GetData();
-    }
-}
-
-```
-
 ## Active cache eviction
 
-```
+```c#
 // UserController.cs
 [ApiController]
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
     [Route("/"), HttpGet]
-    [Caching(typeof(Cacheable), "user", "{id}", TimeSpan.TicksPerHour * 2)] // Cache expires after two hours
+    [Caching(typeof(Cacheable), "user", "{id}")]
     public User Get([FromQuery] string id)
     {
         return DataUtils.GetData();
@@ -90,54 +75,85 @@ public class UserController : ControllerBase
 
 ```
 
-## ⭐️⭐️️Match both uses⭐️⭐️
+## 🎬 ️️Match both uses
 
+```c#
+// **** ‼️ If the cache is hit, 'Evicting' will only be executed once ‼️ ****
+
+[Route("/evict-and-cache"), HttpGet]
+[Caching(typeof(Cacheable), "anson", "QueryId:{id}")]
+[Evicting(typeof(CacheEvict), new[] { "anything" }, "QueryId:{id}")]
+public IEnumerable<WeatherForecast> Get([FromQuery] string id)
+{
+    return DataUtils.GetData();
+}
+
+
+
+// **** ‼️ Evicting will always execute ‼️ ****
+
+[Route("/evict-and-cache"), HttpGet]
+[Evicting(typeof(CacheEvict), new[] { "anything" }, "QueryId:{id}")]
+[Caching(typeof(Cacheable), "anson", "QueryId:{id}")]
+public IEnumerable<WeatherForecast> Get([FromQuery] string id)
+{
+    return DataUtils.GetData();
+}
 ```
-    **** ‼️ If the cache is hit, 'Evicting' will only be executed once ‼️ ****
-    
-    [Route("/evict-and-cache"), HttpGet]
-    [Caching(typeof(Cacheable), "anson", "QueryId:{id}")]
-    [Evicting(typeof(CacheEvict), new[] { "anything" }, "QueryId:{id}")]
-    public IEnumerable<WeatherForecast> Get([FromQuery] string id)
-    {
-        return DataUtils.GetData();
-    }
-    
-    
-    
-    **** ‼️ Evicting will always execute ‼️ ****
-    
-    [Route("/evict-and-cache"), HttpGet]
-    [Evicting(typeof(CacheEvict), new[] { "anything" }, "QueryId:{id}")]
-    [Caching(typeof(Cacheable), "anson", "QueryId:{id}")]
-    public IEnumerable<WeatherForecast> Get([FromQuery] string id)
-    {
-        return DataUtils.GetData();
-    }
+
+
+## 🎃 Parameter Description
+
+```c#
+public static void AddCoreCache(
+    this IServiceCollection services,
+    uint buckets = 5,                 
+    uint bucketMaxCapacity = 500000,
+    MaxMemoryPolicy maxMemoryPolicy = MaxMemoryPolicy.LRU,
+    int cleanUpPercentage = 10
+)
+{
+   services.AddSingleton<ICacheClient>(new MemoryCache(buckets, bucketMaxCapacity, MaxMemoryPolicy.LRU, cleanUpPercentage));
+}
 ```
+
+|                          Parameter                           | Type |       Default       | Require | Explain                                                                  |
+|:------------------------------------------------------------:|:----:|:-------------------:|:-------:|--------------------------------------------------------------------------|
+|                          `buckets`                           | uint |          5          |  false  | The number of containers to store the cache, up to 128                   |
+|                     `bucketMaxCapacity`                      | uint |       500000        |  false  | The capacity of each barrel, it is recommended that 500,000 ~ 1,000,000  |
+|                      `maxMemoryPolicy`                       | MaxMemoryPolicy | MaxMemoryPolicy.LRU |  false  | LRU = Least Recently Used , TTL = Time To Live, Or RANDOM                |
+|                     `cleanUpPercentage`                      | int |         10          |  false  | After the capacity is removed, the percentage deleted                    |  
 
 ## Variable explanation
 
-```
+```js
 // foo:bar:1 -> "item1"
 {
-   "foo": {
-      "bar": [
-         "item1",
-         "qux"
-     ]
-   }
+    "foo"
+:
+    {
+        "bar"
+    :
+        [
+            "item1",
+            "qux"
+        ]
+    }
 }
 
 // foo:bar:0:url -> "test.weather.com"
 {
-   "foo": {
-      "bar": [
-         {
-            "url": "test.weather.com",
-            "key": "DEV1234567"
-         }
-     ]
-   }
+    "foo"
+:
+    {
+        "bar"
+    :
+        [
+            {
+                "url": "test.weather.com",
+                "key": "DEV1234567"
+            }
+        ]
+    }
 }
 ```

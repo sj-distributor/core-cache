@@ -9,8 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
-        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="coverlet.collector" Version="1.2.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -31,20 +31,6 @@ public class MvcRequestCacheTests : IClassFixture<WebApplicationFactory<Program>
 
         Assert.Equal(result1, result2);
     }
-    
-    [Fact]
-    public async void MvcRequestCanAutoEvict()
-    {
-        var resp1 = await _httpClient.GetAsync("/home/index?id=2");
-        var result1 = await resp1.Content.ReadAsStringAsync();
-
-        await Task.Run(() => Thread.Sleep(TimeSpan.FromSeconds(2.5)));
-
-        var resp2 = await _httpClient.GetAsync("/home/index?id=2");
-        var result2 = await resp2.Content.ReadAsStringAsync();
-
-        Assert.NotEqual(result1, result2);
-    }
 
     [Fact]
     public async void MvcRequestCanTriggerEvict()

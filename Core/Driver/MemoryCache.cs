@@ -2,16 +2,21 @@ using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text;
 using Core.Entity;
+using Core.Enum;
 
 namespace Core.Driver;
 
 public class MemoryCache : ICacheClient
 {
     private readonly uint _buckets;
+    private readonly MaxMemoryPolicy _maxMemoryPolicy;
+    private readonly uint _bucketMaxCapacity;
+    private static int _cleanupRange;
 
     private Dictionary<uint, ConcurrentDictionary<string, CacheItem>> _map = new();
 
-    public MemoryCache(uint buckets = 5)
+    public MemoryCache(uint buckets = 5, uint bucketMaxCapacity = 500000,
+        MaxMemoryPolicy maxMemoryPolicy = MaxMemoryPolicy.LRU, int cleanUpPercentage = 10)
     {
         if (buckets > 128)
         {
@@ -19,44 +24,29 @@ public class MemoryCache : ICacheClient
         }
 
         _buckets = buckets;
+        _bucketMaxCapacity = bucketMaxCapacity;
+        _maxMemoryPolicy = maxMemoryPolicy;
+        _cleanupRange = (int) (bucketMaxCapacity - (bucketMaxCapacity / cleanUpPercentage));
         InitBucket(_map, _buckets);
     }
 
-    public ValueTask Set(string key, string value, long expire = 0)
+    public ValueTask Set(string key, string value, long _ = 0)
     {
         var bucket = GetBucket(HashKey(key));
 
-        if (!bucket.ContainsKey(key))
+        if (bucket.ContainsKey(key)) return ValueTask.CompletedTask;
+        if (bucket.Count >= _bucketMaxCapacity)
         {
-            if (expire > 0)
-            {
-                bucket.TryAdd(key, new CacheItem()
-                {
-                    Value = value,
-                    Timeout = DateTime.Now.AddMilliseconds(expire / 10000)
-                });
-            }
-            else
-            {
-                bucket.TryAdd(key, new CacheItem()
-                {
-                    Value = value,
-                    Timeout = null
-                });
-            }
+            ReleaseCached(bucket);
         }
+
+        bucket.TryAdd(key, new CacheItem
+        {
+            Value = value,
+            CreatedAt = DateTime.Now,
+        });
 
         return ValueTask.CompletedTask;
-    }
-
-    private void EvictLoop(Dictionary<uint, ConcurrentDictionary<string, CacheItem>> map)
-    {
-        foreach (var bucketId in map.Keys)
-        {
-            var bucket = GetBucket(bucketId);
-            new Timer((bk) => { DeleteTimeout(bk as ConcurrentDictionary<string, CacheItem>); }, bucket, TimeSpan.Zero,
-                TimeSpan.FromHours(1));
-        }
     }
 
     public ValueTask<string> Get(string key)
@@ -64,10 +54,9 @@ public class MemoryCache : ICacheClient
         var bucket = GetBucket(HashKey(key));
 
         if (!bucket.TryGetValue(key, out var cacheItem)) return ValueTask.FromResult("");
-        if (!(DateTime.Now > cacheItem.Timeout) || cacheItem.Timeout == null)
-            return ValueTask.FromResult(cacheItem.Value);
-        bucket.TryRemove(key, out var _);
-        return ValueTask.FromResult("");
+
+        ++cacheItem.Hits;
+        return ValueTask.FromResult(cacheItem.Value);
     }
 
     public ValueTask Delete(string key)
@@ -96,25 +85,12 @@ public class MemoryCache : ICacheClient
         return ValueTask.CompletedTask;
     }
 
-    private void DeleteTimeout(ConcurrentDictionary<string, CacheItem> bucket)
-    {
-        var now = DateTime.Now;
-        foreach (var key in bucket.Keys)
-        {
-            if (!bucket.TryGetValue(key, out var value)) continue;
-            if (!(now > value.Timeout)) continue;
-            bucket.TryRemove(key, out var _);
-        }
-    }
-
     private void InitBucket(Dictionary<uint, ConcurrentDictionary<string, CacheItem>> map, uint buckets)
     {
         for (uint i = 0; i < buckets; i++)
         {
             map.Add(i, new ConcurrentDictionary<string, CacheItem>());
         }
-
-        EvictLoop(map);
     }
 
     private ConcurrentDictionary<string, CacheItem> GetBucket(uint bucketId)
@@ -125,6 +101,45 @@ public class MemoryCache : ICacheClient
         }
 
         throw new Exception($"Not Found Bucket: {bucketId}");
+    }
+
+    private void ReleaseCached(ConcurrentDictionary<string, CacheItem> bucket)
+    {
+        var bucketCount = bucket.Count;
+
+        if (_maxMemoryPolicy == MaxMemoryPolicy.RANDOM)
+        {
+            foreach (var key in bucket.Keys.Take(new Range(_cleanupRange, bucketCount)))
+            {
+                bucket.Remove(key, out var _);
+            }
+        }
+        else
+        {
+            IOrderedEnumerable<KeyValuePair<string, CacheItem>> keyValuePairs;
+            if (_maxMemoryPolicy == MaxMemoryPolicy.LRU)
+            {
+                keyValuePairs = bucket.OrderByDescending(
+                    x => x.Value.Hits
+                );
+            }
+            else
+            {
+                keyValuePairs = bucket.OrderByDescending(
+                    x => x.Value.CreatedAt
+                );
+            }
+
+            foreach (var keyValuePair in keyValuePairs.Take(new Range(_cleanupRange, bucketCount)))
+            {
+                bucket.Remove(keyValuePair.Key, out var _);
+            }
+        }
+    }
+
+    public Dictionary<uint, ConcurrentDictionary<string, CacheItem>> GetBuckets()
+    {
+        return _map;
     }
 
     private uint HashKey(string key)

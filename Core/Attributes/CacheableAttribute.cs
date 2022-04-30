@@ -85,16 +85,16 @@ public class Cacheable : Attribute, IAsyncActionFilter
 
                         view.RenderAsync(viewContext).GetAwaiter().GetResult();
 
-                        await _cacheClient.Set(key, writer.ToString(), _expire);
+                        await _cacheClient.Set(key, writer.ToString(), 0);
                     }
 
                     break;
                 }
                 case JsonResult jsonResult:
-                    await _cacheClient.Set(key, JsonConvert.SerializeObject(jsonResult.Value), _expire);
+                    await _cacheClient.Set(key, JsonConvert.SerializeObject(jsonResult.Value), 0);
                     break;
                 case ObjectResult objectResult:
-                    await _cacheClient.Set(key, JsonConvert.SerializeObject(objectResult.Value), _expire);
+                    await _cacheClient.Set(key, JsonConvert.SerializeObject(objectResult.Value), 0);
                     break;
             }
 

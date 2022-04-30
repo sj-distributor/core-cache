@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Core.Attributes;
 using CoreCache.ApiForTest.Entity;
 using CoreCache.ApiForTest.Utils;
@@ -13,7 +10,7 @@ namespace CoreCache.ApiForTest.Controllers;
 public class WeatherForecastController : ControllerBase
 {
     [Route("/"), HttpGet]
-    [Caching(typeof(Cacheable), "anything", "QueryId:{id}", TimeSpan.TicksPerSecond * 2)]
+    [Caching(typeof(Cacheable), "anything", "QueryId:{id}")]
     public IEnumerable<WeatherForecast> Get([FromQuery] string id)
     {
         return DataUtils.GetData();
