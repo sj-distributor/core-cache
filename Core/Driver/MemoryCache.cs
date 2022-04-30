@@ -90,8 +90,7 @@ public class MemoryCache : ICacheClient
         }
         else
         {
-            var bucket = GetBucket(HashKey(key));
-            bucket.Keys.Where(x => x == key).ToList().ForEach(k => bucket.TryRemove(k, out var _));
+            GetBucket(HashKey(key)).TryRemove(key, out var _);
         }
 
         return ValueTask.CompletedTask;

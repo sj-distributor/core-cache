@@ -35,7 +35,7 @@ public class WeatherForecastController : ControllerBase
     }
 
     [Route("/users"), HttpPost]
-    [Caching(typeof(Cacheable), "post", "user:1:id")]
+    [Caching(typeof(Cacheable), "post", "{users:1:id}")]
     public IEnumerable<WeatherForecast> PostUsers([FromBody] List<User> users)
     {
         return DataUtils.GetData();
