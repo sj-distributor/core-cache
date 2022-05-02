@@ -26,7 +26,7 @@ public class MemoryCache : ICacheClient
         _buckets = buckets;
         _bucketMaxCapacity = bucketMaxCapacity;
         _maxMemoryPolicy = maxMemoryPolicy;
-        _cleanupRange = (int) (bucketMaxCapacity - (bucketMaxCapacity / cleanUpPercentage));
+        _cleanupRange = (int)(bucketMaxCapacity - (bucketMaxCapacity / cleanUpPercentage));
         InitBucket(_map, _buckets);
     }
 
@@ -89,7 +89,12 @@ public class MemoryCache : ICacheClient
     {
         for (uint i = 0; i < buckets; i++)
         {
-            map.Add(i, new ConcurrentDictionary<string, CacheItem>());
+            map.Add(i,
+                new ConcurrentDictionary<string, CacheItem>(
+                    concurrencyLevel: Environment.ProcessorCount * 2,
+                    (int)_bucketMaxCapacity + 1024
+                )
+            );
         }
     }
 
@@ -105,34 +110,39 @@ public class MemoryCache : ICacheClient
 
     private void ReleaseCached(ConcurrentDictionary<string, CacheItem> bucket)
     {
-        var bucketCount = bucket.Count;
+        lock (bucket)
+        {
+            if (bucket.Count < _bucketMaxCapacity) return;
 
-        if (_maxMemoryPolicy == MaxMemoryPolicy.RANDOM)
-        {
-            foreach (var key in bucket.Keys.Take(new Range(_cleanupRange, bucketCount)))
+            var bucketCount = bucket.Count;
+
+            if (_maxMemoryPolicy == MaxMemoryPolicy.RANDOM)
             {
-                bucket.Remove(key, out var _);
-            }
-        }
-        else
-        {
-            IOrderedEnumerable<KeyValuePair<string, CacheItem>> keyValuePairs;
-            if (_maxMemoryPolicy == MaxMemoryPolicy.LRU)
-            {
-                keyValuePairs = bucket.OrderByDescending(
-                    x => x.Value.Hits
-                );
+                foreach (var key in bucket.Keys.Take(new Range(_cleanupRange, bucketCount)))
+                {
+                    bucket.Remove(key, out var _);
+                }
             }
             else
             {
-                keyValuePairs = bucket.OrderByDescending(
-                    x => x.Value.CreatedAt
-                );
-            }
+                IOrderedEnumerable<KeyValuePair<string, CacheItem>> keyValuePairs;
+                if (_maxMemoryPolicy == MaxMemoryPolicy.LRU)
+                {
+                    keyValuePairs = bucket.OrderByDescending(
+                        x => x.Value.Hits
+                    );
+                }
+                else
+                {
+                    keyValuePairs = bucket.OrderByDescending(
+                        x => x.Value.CreatedAt
+                    );
+                }
 
-            foreach (var keyValuePair in keyValuePairs.Take(new Range(_cleanupRange, bucketCount)))
-            {
-                bucket.Remove(keyValuePair.Key, out var _);
+                foreach (var keyValuePair in keyValuePairs.Take(new Range(_cleanupRange, bucketCount)))
+                {
+                    bucket.Remove(keyValuePair.Key, out var _);
+                }
             }
         }
     }

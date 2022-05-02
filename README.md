@@ -113,7 +113,7 @@ public static void AddCoreCache(
     int cleanUpPercentage = 10
 )
 {
-   services.AddSingleton<ICacheClient>(new MemoryCache(buckets, bucketMaxCapacity, MaxMemoryPolicy.LRU, cleanUpPercentage));
+   services.AddSingleton<ICacheClient>(new MemoryCache(buckets, bucketMaxCapacity, maxMemoryPolicy, cleanUpPercentage));
 }
 ```
 
