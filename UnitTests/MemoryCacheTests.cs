@@ -6,14 +6,13 @@ using Xunit;
 
 namespace UnitTests;
 
-[Collection("Sequential")]
 public class MemoryCacheTests
 {
     public MemoryCache _memoryCache;
 
     public MemoryCacheTests()
     {
-        _memoryCache = new MemoryCache(1, 50, MaxMemoryPolicy.TTL);
+        _memoryCache = new MemoryCache( 50, MaxMemoryPolicy.TTL);
     }
 
     [Theory]
@@ -22,7 +21,7 @@ public class MemoryCacheTests
     [InlineData(MaxMemoryPolicy.RANDOM)]
     public void TestWhenTheMemoryIsFull_EliminatedSuccess(MaxMemoryPolicy maxMemoryPolicy)
     {
-        var memoryCache = new MemoryCache(1, 50, maxMemoryPolicy);
+        var memoryCache = new MemoryCache(50, maxMemoryPolicy);
         for (var i = 0; i < 50; i++)
         {
             Thread.Sleep(TimeSpan.FromSeconds(0.1));
@@ -32,9 +31,9 @@ public class MemoryCacheTests
                 memoryCache.Get($"{i}");
             }
         }
-        Assert.Equal(memoryCache.GetBuckets()[0].Count, 50);
+        Assert.Equal(memoryCache.GetBuckets().Count, 50);
         memoryCache.Set("100", "100");
-        Assert.Equal(memoryCache.GetBuckets()[0].Count, 50 - (50 / 10) + 1);
+        Assert.Equal(memoryCache.GetBuckets().Count, 50 - (50 / 10) + 1);
     }
 
     [Theory]

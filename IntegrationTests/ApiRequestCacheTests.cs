@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 using CoreCache.ApiForTest.Entity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
@@ -10,7 +8,6 @@ using Xunit;
 namespace IntegrationTests;
 
 [Collection("Sequential")]
-
 public class ApiRequestCacheTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient _httpClient;
