@@ -16,6 +16,7 @@
   automatically evicted on cache size overflow.
 * It is easy to implement cache expiration on top of `NetCoreCache` by caching values with marshaled deadlines and
   verifying deadlines after reading these values from the cache.
+* There are three ways of cache eviction, `LRU` and `TTL` and `Random`
 
 ## 🤟Install
 
