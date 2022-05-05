@@ -12,8 +12,7 @@ namespace Core.Driver;
 
         private static ConcurrentDictionary<string, CacheItem> _dist;
 
-        public MemoryCache(int maxCapacity = 5000000,
-            MaxMemoryPolicy maxMemoryPolicy = MaxMemoryPolicy.LRU, int cleanUpPercentage = 10)
+        public MemoryCache(int maxCapacity = 5000000, MaxMemoryPolicy maxMemoryPolicy = MaxMemoryPolicy.LRU, int cleanUpPercentage = 10)
         {
             _maxCapacity = maxCapacity;
             _maxMemoryPolicy = maxMemoryPolicy;

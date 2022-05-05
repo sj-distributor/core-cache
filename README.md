@@ -10,13 +10,21 @@
 * Easy use of caching with dotnet core
 * Fast, concurrent, evicting in-memory cache written to keep big number of entries without impact on performance.
 
-## 🪣 About Cache expiration
+## ⏱ About Cache expiration
+
 * Why`NetCoreCache` doesn't support cache expiration?
 * Because we don't need cache expiration in `NetCoreCache`. Cached entries inside `NetCoreCache` never expire. They are
   automatically evicted on cache size overflow.
 * It is easy to implement cache expiration on top of `NetCoreCache` by caching values with marshaled deadlines and
   verifying deadlines after reading these values from the cache.
 * There are three ways of cache eviction, `LRU` and `TTL` and `Random`
+
+## 🪣 About BigCache ( Multi Buckets )
+
+* Fast. Performance scales on multi-core CPUs.
+* The cache consists of many buckets, each with its own lock. This helps scaling the performance on multi-core CPUs,
+  since multiple CPUs may concurrently access distinct buckets.
+* `NetCoreCache` automatically evicts old entries when reaching the maximum cache size set on its creation.
 
 ## 🤟Install
 
@@ -100,10 +108,10 @@ public IEnumerable<WeatherForecast> Get([FromQuery] string id)
 }
 ```
 
-
 ## 🎃 Parameter Description
 
 ```c#
+// MemoryCache
 public static void AddCoreCache(
     this IServiceCollection services,                
     uint bucketMaxCapacity = 1000000,
@@ -111,15 +119,28 @@ public static void AddCoreCache(
     int cleanUpPercentage = 10
 )
 {
-   services.AddSingleton<ICacheClient>(new MemoryCache(buckets, bucketMaxCapacity, maxMemoryPolicy, cleanUpPercentage));
+   services.AddSingleton<ICacheClient>(new MemoryCache(bucketMaxCapacity, maxMemoryPolicy, cleanUpPercentage));
 }
+
+// MulitBucketsMemoryCache
+public static void AddMultiBucketsCoreCache(
+        this IServiceCollection services,
+        uint buckets = 5,
+        uint maxCapacity = 500000,
+        MaxMemoryPolicy maxMemoryPolicy = MaxMemoryPolicy.LRU,
+        int cleanUpPercentage = 10)
+    {
+        services.AddSingleton<ICacheClient>(
+            new MultiBucketsMemoryCache(buckets, maxCapacity, maxMemoryPolicy, cleanUpPercentage));
+    }
 ```
 
-|                          Parameter                           | Type |       Default       | Require | Explain                                                           |
-|:------------------------------------------------------------:|:----:|:-------------------:|:-------:|-------------------------------------------------------------------|
-|                     `bucketMaxCapacity`                      | uint |       1000000       |  false  | Initialize capacity |
-|                      `maxMemoryPolicy`                       | MaxMemoryPolicy | MaxMemoryPolicy.LRU |  false  | LRU = Least Recently Used , TTL = Time To Live, Or RANDOM         |
-|                     `cleanUpPercentage`                      | int |         10          |  false  | After the capacity is removed, the percentage deleted             |  
+|                          Parameter                           | Type |       Default       | Require | Explain                                                                                                                                     |
+|:------------------------------------------------------------:|:----:|:-------------------:|:-------:|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `buckets` | uint | 5 | false | The number of containers to store the cache, up to 128                                                                                      |
+|                     `bucketMaxCapacity`                      | uint |       1000000       |  false  | (MemoryCache) Initialize capacity <br/>  <br/> (MulitBucketsMemroyCache) The capacity of each barrel, it is recommended that 500,000 ~ 1,000,000 |
+|                      `maxMemoryPolicy`                       | MaxMemoryPolicy | MaxMemoryPolicy.LRU |  false  | LRU = Least Recently Used , TTL = Time To Live, Or RANDOM                                                                                   |
+|                     `cleanUpPercentage`                      | int |         10          |  false  | After the capacity is removed, the percentage deleted                                                                                       |  
 
 ## Variable explanation
 
