@@ -30,7 +30,7 @@ public class MultiBucketsMemoryCache : ICacheClient
         InitBucket(_map, _buckets);
     }
 
-    public ValueTask Set(string key, string value, long _ = 0)
+    public ValueTask Set(string key, string value, long expire = 0)
     {
         var bucket = GetBucket(HashKey(key));
 
@@ -43,7 +43,8 @@ public class MultiBucketsMemoryCache : ICacheClient
         bucket.TryAdd(key, new CacheItem
         {
             Value = value,
-            CreatedAt = DateTime.Now,
+            CreatedAt = DateTime.Now.Ticks,
+            ExpireAt = expire > 0 ? DateTime.Now.AddSeconds(expire).Ticks : DateTime.Now.AddYears(1).Ticks
         });
 
         return ValueTask.CompletedTask;
@@ -54,6 +55,11 @@ public class MultiBucketsMemoryCache : ICacheClient
         var bucket = GetBucket(HashKey(key));
 
         if (!bucket.TryGetValue(key, out var cacheItem)) return ValueTask.FromResult("");
+        if (cacheItem.ExpireAt < DateTime.Now.Ticks)
+        {
+            bucket.Remove(key,  out  _);
+            return ValueTask.FromResult("");
+        }
 
         ++cacheItem.Hits;
         return ValueTask.FromResult(cacheItem.Value);
@@ -65,7 +71,7 @@ public class MultiBucketsMemoryCache : ICacheClient
         {
             if (key.First() == '*')
             {
-                key = key.Substring(1, key.Length);
+                key = key.Substring(1, key.Length - 1);
             }
             else if (key.Last() == '*')
             {

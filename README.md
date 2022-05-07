@@ -11,16 +11,9 @@
 * Fast, concurrent, evicting in-memory cache written to keep big number of entries without impact on performance.
 
 ## ⏱ About Cache expiration
-
-* Why`NetCoreCache` doesn't support cache expiration?
-* Because we don't need cache expiration in `NetCoreCache`. Cached entries inside `NetCoreCache` never expire. They are
-  automatically evicted on cache size overflow.
-* It is easy to implement cache expiration on top of `NetCoreCache` by caching values with marshaled deadlines and
-  verifying deadlines after reading these values from the cache.
 * There are three ways of cache eviction, `LRU` and `TTL` and `Random`
 
 ## 🪣 About BigCache ( Multi Buckets )
-
 * Fast. Performance scales on multi-core CPUs.
 * The cache consists of many buckets, each with its own lock. This helps scaling the performance on multi-core CPUs,
   since multiple CPUs may concurrently access distinct buckets.
@@ -47,7 +40,7 @@ builder.Services.AddCoreCache();
 public class UserController : ControllerBase
 {
     [Route("/"), HttpGet]
-    [Caching(typeof(Cacheable), "user", "{id}")]
+    [Caching(typeof(Cacheable), "user", "{id}", 2)] // Cache expires after two seconds
     public User Get([FromQuery] string id)
     {
         return DataUtils.GetData();
@@ -64,7 +57,7 @@ public class UserController : ControllerBase
 public class UserController : ControllerBase
 {
     [Route("/"), HttpGet]
-    [Caching(typeof(Cacheable), "user", "{id}")]
+    [Caching(typeof(Cacheable), "user", "{id}")] // Long term cache
     public User Get([FromQuery] string id)
     {
         return DataUtils.GetData();

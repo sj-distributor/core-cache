@@ -20,7 +20,7 @@ namespace Core.Driver;
             _dist = new ConcurrentDictionary<string, CacheItem>(Environment.ProcessorCount * 2, _maxCapacity);
         }
 
-        public ValueTask Set(string key, string value, long _ = 0)
+        public ValueTask Set(string key, string value, long expire = 0)
         {
             if (_dist.ContainsKey(key)) return ValueTask.CompletedTask;
             if (_dist.Count >= _maxCapacity)
@@ -31,7 +31,8 @@ namespace Core.Driver;
             _dist.TryAdd(key, new CacheItem
             {
                 Value = value,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.Now.Ticks,
+                ExpireAt = expire > 0 ? DateTime.Now.AddSeconds(expire).Ticks : DateTime.Now.AddYears(1).Ticks
             });
 
             return ValueTask.CompletedTask;
@@ -40,6 +41,12 @@ namespace Core.Driver;
         public ValueTask<string> Get(string key)
         {
             if (!_dist.TryGetValue(key, out var cacheItem)) return ValueTask.FromResult("");
+            
+            if (cacheItem.ExpireAt < DateTime.Now.Ticks)
+            {
+                _dist.Remove(key,  out  _);
+                return ValueTask.FromResult("");
+            }
 
             ++cacheItem.Hits;
             return ValueTask.FromResult(cacheItem.Value);
@@ -51,7 +58,7 @@ namespace Core.Driver;
             {
                 if (key.First() == '*')
                 {
-                    key = key.Substring(1, key.Length);
+                    key = key.Substring(1, key.Length - 1);
                 }
                 else if (key.Last() == '*')
                 {

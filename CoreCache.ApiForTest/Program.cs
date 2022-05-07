@@ -1,4 +1,5 @@
 using Core;
+using Core.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -11,6 +12,7 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
 
 // 添加缓存依赖
 builder.Services.AddCoreCache();
+// builder.Services.AddMultiBucketsCoreCache();
 
 // Add services to the container.
 builder.Services.AddControllers();

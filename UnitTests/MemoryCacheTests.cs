@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Core.Driver;
 using Core.Enum;
 using Xunit;
@@ -60,10 +61,34 @@ public class MemoryCacheTests
     [Theory]
     [InlineData("anson1111", "18", "")]
     [InlineData("anson2222", "19", "")]
-    public async void TestMemoryCacheCanDeleteByPattern(string key, string value, string result)
+    public async void TestMemoryCacheCanDeleteByLastPattern(string key, string value, string result)
     {
         await _memoryCache.Set(key, value);
         await _memoryCache.Delete("anson*");
+        var s = await _memoryCache.Get(key);
+        Assert.Equal(s, result);
+    }
+    
+    [Theory]
+    [InlineData("1111Joe", "18", "")]
+    [InlineData("2222Joe", "19", "")]
+    public async void TestMemoryCacheCanDeleteByFirstPattern(string key, string value, string result)
+    {
+        await _memoryCache.Set(key, value);
+        await _memoryCache.Delete("*Joe");
+        var s = await _memoryCache.Get(key);
+        Assert.Equal(s, result);
+    }
+    
+    [Theory]
+    [InlineData("anson10", "18", "", 1)]
+    [InlineData("anson11", "19", "", 1)]
+    public async void TestMemoryCacheCanExpire(string key, string value, string result, long expire)
+    {
+        await _memoryCache.Set(key, value, expire);
+
+        await Task.Run(() => Thread.Sleep(TimeSpan.FromSeconds(2)));
+        
         var s = await _memoryCache.Get(key);
         Assert.Equal(s, result);
     }
